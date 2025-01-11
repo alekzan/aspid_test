@@ -54,3 +54,7 @@ flask-app.log
 app_original.py
 data_utilities.py
 app.py
+
+# Allow bin folder and its contents
+!bin/
+!bin/*

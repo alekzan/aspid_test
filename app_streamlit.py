@@ -5,6 +5,10 @@ import uuid
 # Import your chatbot_graph code
 from chatbot_graph import call_model
 
+import os
+
+os.environ["SQLITE_BINARY"] = "./bin/sqlite3"
+
 
 def main():
     st.title("Chatbot with Langgraph")
