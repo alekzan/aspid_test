@@ -1,4 +1,11 @@
-# airregio_graph_crm.py
+try:
+    import pysqlite3 as sqlite3
+    import sys
+
+    sys.modules["sqlite3"] = sqlite3
+except ImportError:
+    raise RuntimeError("pysqlite3 is not installed. Add it to requirements.txt.")
+
 import operator
 import os
 import ssl
@@ -90,8 +97,11 @@ retriever_tool_data_products = create_retriever_tool(
 # It is designed to be passed to an LLM, so the LLM can trigger human assistance
 # whenever it cannot handle a request.
 
+
 @tool
-def call_for_human_help(client_phone: str, body: str, email_receiver: str = "alejandro_capellan@hotmail.com") -> str:
+def call_for_human_help(
+    client_phone: str, body: str, email_receiver: str = "alejandro_capellan@hotmail.com"
+) -> str:
     """
     Call for human assistance when the AI cannot resolve the user's query.
 
@@ -141,7 +151,6 @@ def call_for_human_help(client_phone: str, body: str, email_receiver: str = "ale
         return f"Fallo al enviar el correo para asistencia humana a {email_receiver}. Error: {e}"
 
 
-
 # clasificar_usuario
 @tool
 def clasificar_usuario(tipo_de_piel: str):
@@ -156,7 +165,8 @@ def clasificar_usuario(tipo_de_piel: str):
     Returns:
         str: The skin type assigned to the user.
     """
-    return f'Tipo de piel: {tipo_de_piel}. Pregunta al usuario si desea una rutina y consejos para su tipo de piel.'
+    return f"Tipo de piel: {tipo_de_piel}. Pregunta al usuario si desea una rutina y consejos para su tipo de piel."
+
 
 # start_skin_test
 @tool
@@ -169,9 +179,20 @@ def start_skin_test():
     """
     return "Vamos a aplicar un skin test para conocer el tipo de piel del usuario. Pregunta al usuario si está listo para comenzar."
 
-tools = [retriever_tool_faq_tienda, retriever_tool_data_products, call_for_human_help, start_skin_test]
 
-tools_for_skin_test = [retriever_tool_faq_tienda, retriever_tool_data_products, call_for_human_help, clasificar_usuario]
+tools = [
+    retriever_tool_faq_tienda,
+    retriever_tool_data_products,
+    call_for_human_help,
+    start_skin_test,
+]
+
+tools_for_skin_test = [
+    retriever_tool_faq_tienda,
+    retriever_tool_data_products,
+    call_for_human_help,
+    clasificar_usuario,
+]
 
 react_prompt = f"""Eres Assy, un asistente virtual de Aspid Pro. 
 
