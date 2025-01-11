@@ -1,10 +1,6 @@
 requests
-logging
 groq
 streamlit
-ssl
-smtplib
-email
 python-dotenv
 langgraph
 langgraph-checkpoint
