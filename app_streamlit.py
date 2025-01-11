@@ -2,8 +2,6 @@ import streamlit as st
 import random
 import uuid
 import os
-import subprocess
-
 
 # Import your chatbot_graph code
 from chatbot_graph import call_model
@@ -14,11 +12,6 @@ os.environ["SQLITE_BINARY"] = "./bin/sqlite3"
 
 def main():
     st.title("Chatbot with Langgraph")
-    st.title("Dependency Checker")
-
-    if st.button("Show Installed Dependencies"):
-        result = subprocess.run(["pip", "freeze"], capture_output=True, text=True)
-        st.text(result.stdout)
 
     # 0) Restart Conversation Button
     if st.button("Restart Conversation"):
