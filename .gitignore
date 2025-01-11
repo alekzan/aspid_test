@@ -13,15 +13,18 @@ __pycache__/
 # Ignore everything inside the data folder by default
 data/*
 
-# Do not ignore the specific folders and their contents
+# Do not ignore specific folders and their contents
 !data/chroma_vectorstore_informacion_de_tienda/
 !data/chroma_vectorstore_informacion_de_tienda/**
-
 !data/chroma_vectorstore_product_data/
 !data/chroma_vectorstore_product_data/**
-
 !data/images/
 !data/images/**
+
+# Allow the graphs folder itself but ignore its contents
+!data/graphs/
+data/graphs/*
+!data/graphs/.gitkeep
 
 # Ignore the following folders and files inside data/
 data/CSV/
@@ -29,19 +32,13 @@ data/MD/
 data/PDF/
 data/SQLite/
 
-# Ignore everything inside the graphs folder, except the folder itself
-data/graphs/*
-!data/graphs/.gitkeep
-
-# Ignore data folder and SQLite DBs
+# Ignore SQLite DBs and specific database files
 *.sqlite3
 *.sqlite
 *.log
-
-# Ignore the specific database file
 data/whatsapp_crm.db
 
-# Allow other folders inside the data directory
+# Allow the main data folder
 !data/
 
 # Ignore Jupyter Notebook files
@@ -50,7 +47,7 @@ data/whatsapp_crm.db
 # Ignore Flask log file
 flask-app.log
 
-# Ignore test files
+# Ignore test files
 app_original.py
 data_utilities.py
 app.py
