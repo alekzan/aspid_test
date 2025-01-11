@@ -43,7 +43,7 @@ os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_PROJECT"] = "Aspid Pro"
 
 
-os.environ["AIRTABLE_API_KEY"] = os.getenv("AIRTABLE_API_KEY")
+# os.environ["AIRTABLE_API_KEY"] = os.getenv("AIRTABLE_API_KEY")
 
 gpt_4o = "gpt-4o-2024-11-20"
 gpt = "gpt-4o-mini"
