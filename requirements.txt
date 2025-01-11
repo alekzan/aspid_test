@@ -1,5 +1,4 @@
 requests
-tempfile
 logging
 groq
 streamlit
