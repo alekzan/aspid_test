@@ -30,13 +30,11 @@ data/graphs/*
 data/CSV/
 data/MD/
 data/PDF/
-data/SQLite/
 
-# Ignore SQLite DBs and specific database files
-*.sqlite3
-*.sqlite
-*.log
-data/whatsapp_crm.db
+# Allow SQLite DBs by removing exclusions
+!data/SQLite/
+!*.sqlite3
+!*.sqlite
 
 # Allow the main data folder
 !data/
