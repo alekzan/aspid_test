@@ -1,0 +1,17 @@
+requests
+tempfile
+logging
+groq
+streamlit
+ssl
+smtplib
+email
+python-dotenv
+langgraph
+langgraph-checkpoint
+langchain-groq
+pydantic
+langchain-chroma
+langchain-openai
+langchain-core
+langchain-tools
