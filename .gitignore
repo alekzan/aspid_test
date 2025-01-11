@@ -55,3 +55,4 @@ app.py
 # Allow bin folder and its contents
 !bin/
 !bin/*
+local_requirements.txt
