@@ -1,0 +1,56 @@
+# Ignore red-tagged folders
+MENSAJES/
+RESUMEN/
+
+# Ignore environment and Python cache files
+.env
+.env.production
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Ignore everything inside the data folder by default
+data/*
+
+# Do not ignore the specific folders and their contents
+!data/chroma_vectorstore_informacion_de_tienda/
+!data/chroma_vectorstore_informacion_de_tienda/**
+
+!data/chroma_vectorstore_product_data/
+!data/chroma_vectorstore_product_data/**
+
+!data/images/
+!data/images/**
+
+# Ignore the following folders and files inside data/
+data/CSV/
+data/MD/
+data/PDF/
+data/SQLite/
+
+# Ignore everything inside the graphs folder, except the folder itself
+data/graphs/*
+!data/graphs/.gitkeep
+
+# Ignore data folder and SQLite DBs
+*.sqlite3
+*.sqlite
+*.log
+
+# Ignore the specific database file
+data/whatsapp_crm.db
+
+# Allow other folders inside the data directory
+!data/
+
+# Ignore Jupyter Notebook files
+*.ipynb
+
+# Ignore Flask log file
+flask-app.log
+
+# Ignore test files
+app_original.py
+data_utilities.py
+app.py
