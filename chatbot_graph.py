@@ -22,12 +22,13 @@ class State(MessagesState):
     summary: str
     message_type: str
     num_llamada: int
-    tipo_de_cliente: str # Paciente o Cliente
-    tipo_de_piel: str # Del Skin Test
-    atencion_humana: bool 
+    tipo_de_cliente: str  # Paciente o Cliente
+    tipo_de_piel: str  # Del Skin Test
+    atencion_humana: bool
     aplicar_skin_test: bool
     client_phone: str
-    
+
+
 # EDGE
 def requires_skin_test(state: State):
     # If aplicar_skin_test is True, go to "skin_test_node", otherwise to "call_model"
@@ -36,7 +37,9 @@ def requires_skin_test(state: State):
     else:
         return "call_model"
 
+
 # NODE
+
 
 def call_model(state: State):
     print("NODE call_model")
@@ -44,13 +47,19 @@ def call_model(state: State):
     # Existing summary and prompt logic
     summary = state.get("summary", "")
     num_llamada = state.get("num_llamada", 0)
+    tipo_de_cliente = state.get("tipo_de_cliente", "")
     tipo_de_piel = state.get("tipo_de_piel", "")
     client_phone = state.get("client_phone", "")
     current_datetime = datetime.now().strftime(
         "Hoy es %A, %d de %B de %Y a las %I:%M %p."
     )
 
-    prompt_with_time = react_prompt.format(tipo_de_piel=tipo_de_piel, current_datetime=current_datetime, client_phone=client_phone)
+    prompt_with_time = react_prompt.format(
+        tipo_de_cliente=tipo_de_cliente,
+        tipo_de_piel=tipo_de_piel,
+        current_datetime=current_datetime,
+        client_phone=client_phone,
+    )
     if summary:
         # Add summary to system message
         system_message_summary = f"Resumen de la conversación anterior: {summary}"
@@ -64,7 +73,7 @@ def call_model(state: State):
     # Bind tools to LLM and invoke
     llm_with_tools = llm.bind_tools(tools)
     response = llm_with_tools.invoke(messages)
-    
+
     # Check for tools
     # Initialize the keys we might update
     state["atencion_humana"] = state.get("atencion_humana", False)
@@ -74,34 +83,52 @@ def call_model(state: State):
     if hasattr(response, "tool_calls") and response.tool_calls:
         for tool_call in response.tool_calls:
             tool_name = tool_call.get("name")
+            tool_args = tool_call.get("args", {})
 
             # If LLM calls for a human's help
             if tool_name == "call_for_human_help":
                 print("NODE REASONER: Se habló a Humano")
                 # This sets the atencion_humana flag
                 state["atencion_humana"] = True
-                
+
             # If LLM calls for a skin test
-            if tool_name == "start_skin_test":
+            elif tool_name == "start_skin_test":
                 print("NODE REASONER: Se inicia skin test")
-                # This sets the atencion_humana flag
+                # This sets the aplicar_skin_test flag
                 state["aplicar_skin_test"] = True
 
+            # If LLM calls to classify variables
+            elif tool_name == "clasificar_variables_de_usuario":
+                print("NODE REASONER: Clasificando variables del usuario")
+                # Extract and update tipo_de_piel and tipo_de_cliente from tool arguments
+                if "tipo_de_piel" in tool_args:
+                    tipo_de_piel = tool_args["tipo_de_piel"]
+                    state["tipo_de_piel"] = tipo_de_piel
+                if "tipo_de_cliente" in tool_args:
+                    tipo_de_cliente = tool_args["tipo_de_cliente"]
+                    state["tipo_de_cliente"] = tipo_de_cliente
+
+    # Return updated state and messages
     if num_llamada != 0:
         return {
             "messages": response,
             "message_type": "text",
+            "tipo_de_piel": tipo_de_piel,
+            "tipo_de_cliente": tipo_de_cliente,
             "atencion_humana": state["atencion_humana"],
-            "aplicar_skin_test": state["aplicar_skin_test"]
+            "aplicar_skin_test": state["aplicar_skin_test"],
         }
-    elif num_llamada == 0:
+    else:
         return {
             "messages": response,
             "message_type": "image",
+            "tipo_de_piel": tipo_de_piel,
+            "tipo_de_cliente": tipo_de_cliente,
             "atencion_humana": state["atencion_humana"],
-            "aplicar_skin_test": state["aplicar_skin_test"]
+            "aplicar_skin_test": state["aplicar_skin_test"],
         }
-        
+
+
 def skin_test_node(state: State):
     print("NODE skin_test_node")
 
@@ -155,7 +182,7 @@ def skin_test_node(state: State):
             "message_type": "text",
             "tipo_de_piel": state["tipo_de_piel"],
             "atencion_humana": state["atencion_humana"],
-            "aplicar_skin_test": state["aplicar_skin_test"]
+            "aplicar_skin_test": state["aplicar_skin_test"],
         }
     else:
         return {
@@ -163,7 +190,7 @@ def skin_test_node(state: State):
             "message_type": "image",
             "tipo_de_piel": state["tipo_de_piel"],
             "atencion_humana": state["atencion_humana"],
-            "aplicar_skin_test": state["aplicar_skin_test"]
+            "aplicar_skin_test": state["aplicar_skin_test"],
         }
 
 
@@ -284,7 +311,6 @@ def clear_tool_messages(state: State):
     return {"messages": messages_to_remove, "num_llamada": num_llamada}
 
 
-
 def should_continue(state: State):
     print("EDGE should_continue")
     messages = state["messages"]
@@ -308,14 +334,16 @@ workflow.add_node("clear_tool_messages", clear_tool_messages)
 workflow.add_node("summarize_conversation", summarize_conversation)
 
 workflow.add_conditional_edges(
-    START, requires_skin_test, 
-    {"skin_test_node": "skin_test_node", "call_model": "call_model"}
-    )
-#workflow.add_edge("skin_test_node", END)
+    START,
+    requires_skin_test,
+    {"skin_test_node": "skin_test_node", "call_model": "call_model"},
+)
+# workflow.add_edge("skin_test_node", END)
 workflow.add_conditional_edges(
-    "skin_test_node", tools_condition, {"tools": "tools_for_skin_test", END: END})
+    "skin_test_node", tools_condition, {"tools": "tools_for_skin_test", END: END}
+)
 workflow.add_edge("tools_for_skin_test", "skin_test_node")
-#workflow.set_entry_point("call_model")
+# workflow.set_entry_point("call_model")
 workflow.add_conditional_edges(
     "call_model", tools_condition, {"tools": "tools", END: "clear_tool_messages"}
 )
@@ -339,9 +367,13 @@ memory = SqliteSaver(conn)
 react_graph = workflow.compile(checkpointer=memory)
 
 
-def call_model(messages, client_phone,config):
+def call_model(messages, client_phone, config):
     # Stream events from the graph
-    events = react_graph.stream({"messages": messages, 'client_phone': client_phone}, config, stream_mode="values")
+    events = react_graph.stream(
+        {"messages": messages, "client_phone": client_phone},
+        config,
+        stream_mode="values",
+    )
 
     response_content = None
     message_type = None

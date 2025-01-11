@@ -180,11 +180,43 @@ def start_skin_test():
     return "Vamos a aplicar un skin test para conocer el tipo de piel del usuario. Pregunta al usuario si está listo para comenzar."
 
 
+# Add information about user's skin type and if they are a professional or general client
+@tool
+def clasificar_variables_de_usuario(
+    tipo_de_piel: str = None, tipo_de_cliente: str = None
+):
+    """
+    Returns the values passed for tipo_de_piel and tipo_de_cliente without additional text.
+
+    Args:
+        tipo_de_piel (str, optional): The skin type classification. Must be one of the following values:
+            - "Piel seca"
+            - "Piel normal"
+            - "Piel grasa"
+        tipo_de_cliente (str, optional): The client type classification. Must be one of the following values:
+            - "Profesional de la Salud"
+            - "Cliente General"
+
+    Returns:
+        dict: A dictionary containing the passed values for `tipo_de_piel` and/or `tipo_de_cliente`.
+    """
+    result = {}
+
+    if tipo_de_piel in ["Piel seca", "Piel normal", "Piel grasa"]:
+        result["tipo_de_piel"] = tipo_de_piel
+
+    if tipo_de_cliente in ["Profesional de la Salud", "Cliente General"]:
+        result["tipo_de_cliente"] = tipo_de_cliente
+
+    return result
+
+
 tools = [
     retriever_tool_faq_tienda,
     retriever_tool_data_products,
     call_for_human_help,
     start_skin_test,
+    clasificar_variables_de_usuario,
 ]
 
 tools_for_skin_test = [
@@ -202,6 +234,8 @@ Responde de manera concisa. No más de 3 oraciones.
 
 Tu primera tarea es preguntar al usuario si es Profesional de la Salud o Cliente General.
 
+TIPO DE CLIENTE (profesional o cliente general): <{{tipo_de_cliente}}>. (NOTA: Si este valor está vacío es porque el usuario no ha respondido tu primera pregunta sobre si es Profesional de la Saludo o Cliente general).
+
 Responde en el mismo idioma en el que el usuario se comunique contigo.  
 
 Si es tu primera interacción con el usuario no olvides saludarlo y presentarte.
@@ -215,7 +249,8 @@ Always answer based only on the information retrieved with your tools.
 Si no sabes la respuesta di que no tienes información al respecto pero que un asistente humano se comunicará en breve con el usuario para ayudarlo.
 
 Si el skin test ya se hizo, éste es el resultado de la clasificación de la piel del usuario: 
-TIPO DE PIEL: {{tipo_de_piel}}. (Si este valor está vacío es porque el skin test no se ha realizado, ya sea porque el usuario te dijo su tipo de piel o por que es un Profesional de la salud y no hay necesidad de hacer test).
+
+TIPO DE PIEL: <{{tipo_de_piel}}>. (NOTA: Si este valor está vacío es porque el skin test no se ha realizado, ya sea porque el usuario te dijo su tipo de piel o por que es un Profesional de la salud y no hay necesidad de hacer test).
 
 Interpreta cualquier información ambigua sobre la fecha y la hora, considerando el siguiente contexto temporal:
 {{current_datetime}}
@@ -227,6 +262,7 @@ El teléfono del usuario es el siguiente: {{client_phone}}
 - retriever_tool_data_products: Utiliza esta herramienta para obtener información sobre la gama de productos de Aspid Pro en todas las categorías. Acceda a detalles como códigos de productos, compatibilidad con tipos de piel, tamaños, precios y descripciones de los principales beneficios y fórmulas para ayudar con la selección de productos.
 - start_skin_test: Utiliza esta herramienta si el usuario no conoce su tipo de piel y require que le aplique el skin test. Después de llamar a la herramienta, solo comenta al usuario que vas a hacerle un pequeño skin test para conocer cuál es su tipo de piel y pregúntale si está listo para comenzar.
 - call_for_human_help: Utiliza esta herramienta para solicitar ayuda a un asistente humano si no puedes responder a la pregunta del usuario. Es crucial que proporciones en el body del mensaje información detallada y específica sobre lo que necesita el usuario para que el asistente humano pueda dar una respuesta efectiva, de ser necesario agrega información del historial de mensajes. Vas a requerir pasar el teléfono del usuario, el cual es el siguiente: {{client_phone}}
+- clasificar_variables_de_usuario: Utiliza esta herramienta para agregar en tu base de datos el tipo de piel y el tipo de cliente del usuario cuando el usuario te de esta información. Puedes pasar el tipo de piel y/o el tipo de cliente como argumentos.
 
 RECUERDA:  
 - Mantén la conversación ligera y profesional, de manera concisa y breve. No más de 3 oraciones.
