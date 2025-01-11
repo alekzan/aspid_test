@@ -4,6 +4,7 @@ streamlit
 python-dotenv
 langgraph
 langgraph-checkpoint
+langgraph-checkpoint-sqlite
 langchain-groq
 pydantic
 langchain-chroma
