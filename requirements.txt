@@ -11,3 +11,4 @@ langchain-chroma
 langchain-openai
 langchain-core
 langchain-tools
+pysqlite3-binary
